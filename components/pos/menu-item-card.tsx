@@ -24,13 +24,13 @@ export function MenuItemCard({ item, onSelect }: MenuItemCardProps) {
 
   return (
     <Card
-      className="cursor-pointer transition-all duration-200 hover:shadow-md group bg-white/80 backdrop-blur-sm border-gray-200 rounded-lg overflow-hidden"
+      className="cursor-pointer transition-all duration-200 hover:shadow-sm group bg-white/80 backdrop-blur-sm border-gray-200 rounded-2xl overflow-hidden"
       onClick={() => onSelect(item)}
     >
       <CardContent className="p-3">
         <div className="flex flex-col h-full items-center text-center">
-          <div className="w-full aspect-square flex items-center justify-center bg-gradient-to-br from-gray-50 to-gray-100 rounded-md mb-3 group-hover:from-primary/5 group-hover:to-primary/10 transition-colors overflow-hidden">
-            <span className="text-5xl">{item.icon}</span>
+          <div className="w-full aspect-square flex items-center justify-center  rounded-md mb-3 group-hover:from-primary/5 group-hover:to-primary/10 transition-colors overflow-hidden">
+            <span className="text-7xl">{item.icon}</span>
           </div>
 
           <div className="flex-1 flex flex-col items-center text-center">

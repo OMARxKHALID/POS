@@ -48,14 +48,6 @@ export function OrderItem({ item }: OrderItemProps) {
                   <p className="text-[10px] text-muted-foreground font-quantico">
                     $ {item.price.toFixed(2)}
                   </p>
-                  {item.notes && (
-                    <Badge
-                      variant="secondary"
-                      className="mt-1 text-[10px] font-quantico bg-blue-50 text-blue-700 border-0 h-4 px-1"
-                    >
-                      {item.notes}
-                    </Badge>
-                  )}
                 </div>
 
                 <Button

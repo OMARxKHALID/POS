@@ -67,8 +67,11 @@ export function OrderCart({
     setLastOrderData(orderData);
     setPrintReceipt(true);
     clearCart();
-    setPaymentModalOpen(false);
-    if (isMobile) toggleCart();
+
+    setTimeout(() => {
+      setPaymentModalOpen(false);
+      if (isMobile) toggleCart();
+    }, 100);
   };
 
   const CartHeader = () => (

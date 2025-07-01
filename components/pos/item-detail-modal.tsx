@@ -56,11 +56,11 @@ export function ItemDetailModal({
 
             <div className="relative w-full h-32 mx-auto mb-3 overflow-hidden rounded-md bg-gradient-to-br from-muted/50 to-muted flex items-center justify-center">
               {image ? (
-                <div className="text-7xl text-muted-foreground">
+                <div className="text-8xl text-muted-foreground">
                   {icon || "🍔"}
                 </div>
               ) : (
-                <div className="text-7xl text-muted-foreground">
+                <div className="text-8xl text-muted-foreground">
                   {icon || "🍔"}
                 </div>
               )}

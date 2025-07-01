@@ -50,11 +50,11 @@ export function SalesDashboard() {
   );
 
   return (
-    <div className="h-full overflow-y-auto">
-      <div className="p-6 space-y-6">
+    <div className="h-full overflow-y-auto ">
+      <div className="p-6 space-y-6 ">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <BarChart3 className="w-6 h-6 text-primary" />
+            <BarChart3 className="w-6 h-6 text-primary " />
             <div>
               <h1 className="text-2xl font-bold text-foreground font-quantico">
                 Analytics Overview
