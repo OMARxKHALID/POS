@@ -1,97 +1,116 @@
-"use client"
+"use client";
 
-import { Button } from "@/components/ui/button"
-import { Card, CardContent } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import { X, Percent } from "lucide-react"
-import { QuantityControl } from "@/components/ui/quantity-control"
-import { PriceDisplay } from "@/components/ui/price-display"
-import { DiscountModal } from "./discount-modal"
-import { useCartStore } from "@/hooks/use-cart-store"
-import { useState } from "react"
-import type { CartItem } from "@/types/pos"
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { X, Edit3 } from "lucide-react";
+import { QuantityControl } from "@/components/ui/quantity-control";
+import { DiscountModal } from "./discount-modal";
+import { useCartStore } from "@/hooks/use-cart-store";
+import { useState } from "react";
+import type { CartItem } from "@/types/pos";
 
 interface OrderItemProps {
-  item: CartItem
+  item: CartItem;
 }
 
 export function OrderItem({ item }: OrderItemProps) {
-  const { updateQuantity, removeFromCart } = useCartStore()
-  const [discountModalOpen, setDiscountModalOpen] = useState(false)
+  const { updateQuantity, removeFromCart } = useCartStore();
+  const [discountModalOpen, setDiscountModalOpen] = useState(false);
 
   const handleDecrease = () => {
     if (item.quantity <= 1) {
-      removeFromCart(item.id)
+      removeFromCart(item.id);
     } else {
-      updateQuantity(item.id, item.quantity - 1)
+      updateQuantity(item.id, item.quantity - 1);
     }
-  }
+  };
 
-  const originalPrice = item.price * item.quantity
-  const discountAmount = originalPrice * ((item.discount || 0) / 100)
-  const finalPrice = originalPrice - discountAmount
+  const originalPrice = item.price * item.quantity;
+  const discountAmount = originalPrice * ((item.discount || 0) / 100);
+  const finalPrice = originalPrice - discountAmount;
 
   return (
     <>
-      <Card className="transition-all duration-200 hover:shadow-md">
-        <CardContent className="p-4">
-          {/* Header Row */}
-          <div className="flex items-start justify-between mb-3">
-            <div className="flex items-center gap-3 flex-1">
-              <div className="w-12 h-12 bg-gradient-to-br from-primary/10 to-primary/20 rounded-xl flex items-center justify-center border border-primary/20">
-                <span className="text-2xl">{item.icon}</span>
+      <Card className="transition-all duration-200 hover:shadow-sm bg-white/80 border-gray-200 rounded-md overflow-hidden">
+        <CardContent className="p-3">
+          <div className="flex items-center gap-3">
+            <div className="w-12 h-12 bg-gradient-to-br from-primary/10 to-primary/20 rounded-md flex items-center justify-center border border-primary/20 flex-shrink-0">
+              <span className="text-lg">{item.icon}</span>
+            </div>
+
+            <div className="flex-1 min-w-0">
+              <div className="flex items-start justify-between mb-2">
+                <div className="flex-1">
+                  <h4 className="font-medium text-xs text-foreground font-quantico mb-1">
+                    {item.name}
+                  </h4>
+                  <p className="text-[10px] text-muted-foreground font-quantico">
+                    $ {item.price.toFixed(2)}
+                  </p>
+                  {item.notes && (
+                    <Badge
+                      variant="secondary"
+                      className="mt-1 text-[10px] font-quantico bg-blue-50 text-blue-700 border-0 h-4 px-1"
+                    >
+                      {item.notes}
+                    </Badge>
+                  )}
+                </div>
+
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="h-6 w-6 p-0 text-gray-400 hover:text-destructive hover:bg-destructive/10 rounded-sm"
+                  onClick={() => removeFromCart(item.id)}
+                >
+                  <X className="w-3 h-3" />
+                </Button>
               </div>
-              <div className="flex-1 min-w-0">
-                <h4 className="font-bold text-sm text-foreground truncate font-quantico">{item.name}</h4>
-                <p className="text-xs text-muted-foreground font-quantico">${item.price.toFixed(2)} each</p>
-                {item.notes && (
-                  <Badge variant="secondary" className="mt-1 text-xs font-quantico">
-                    {item.notes}
+
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <QuantityControl
+                    quantity={item.quantity}
+                    onDecrease={handleDecrease}
+                    onIncrease={() =>
+                      updateQuantity(item.id, item.quantity + 1)
+                    }
+                    size="sm"
+                  />
+
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="h-6 px-2 text-[10px] font-quantico text-blue-600 hover:bg-blue-50 rounded-sm"
+                    onClick={() => setDiscountModalOpen(true)}
+                  >
+                    <Edit3 className="w-2 h-2 mr-1" />
+                    {(item.discount || 0) > 0 ? `${item.discount}%` : "Edit"}
+                  </Button>
+                </div>
+
+                <div className="text-right">
+                  {(item.discount || 0) > 0 && (
+                    <span className="text-[10px] text-gray-400 line-through font-quantico block">
+                      $ {originalPrice.toFixed(2)}
+                    </span>
+                  )}
+                  <span className="text-xs font-semibold text-foreground font-quantico">
+                    $ {finalPrice.toFixed(2)}
+                  </span>
+                </div>
+              </div>
+
+              {(item.discount || 0) > 0 && (
+                <div className="mt-2 pt-2 border-t border-gray-100">
+                  <Badge className="bg-green-50 text-green-700 font-quantico border-0 text-[10px] h-4">
+                    {item.discount}% Discount Applied
                   </Badge>
-                )}
-              </div>
+                </div>
+              )}
             </div>
-
-            <Button
-              variant="ghost"
-              size="sm"
-              className="h-8 w-8 p-0 text-destructive hover:bg-destructive/10"
-              onClick={() => removeFromCart(item.id)}
-            >
-              <X className="w-4 h-4" />
-            </Button>
           </div>
-
-          {/* Controls Row */}
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <QuantityControl
-                quantity={item.quantity}
-                onDecrease={handleDecrease}
-                onIncrease={() => updateQuantity(item.id, item.quantity + 1)}
-                size="sm"
-              />
-
-              <Button
-                variant="outline"
-                size="sm"
-                className="h-8 px-3 text-xs font-quantico bg-transparent"
-                onClick={() => setDiscountModalOpen(true)}
-              >
-                <Percent className="w-3 h-3 mr-1" />
-                {(item.discount || 0) > 0 ? `${item.discount}%` : "Disc"}
-              </Button>
-            </div>
-
-            <PriceDisplay price={finalPrice} originalPrice={originalPrice} discount={item.discount} size="sm" />
-          </div>
-
-          {/* Discount Badge */}
-          {(item.discount || 0) > 0 && (
-            <div className="mt-3 pt-3 border-t">
-              <Badge className="bg-green-100 text-green-800 font-quantico">{item.discount}% OFF Applied</Badge>
-            </div>
-          )}
         </CardContent>
       </Card>
 
@@ -104,5 +123,5 @@ export function OrderItem({ item }: OrderItemProps) {
         itemName={item.name}
       />
     </>
-  )
+  );
 }

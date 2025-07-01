@@ -38,9 +38,7 @@ const ChartContainer = React.forwardRef<
   HTMLDivElement,
   React.ComponentProps<"div"> & {
     config: ChartConfig
-    children: React.ComponentProps<
-      typeof RechartsPrimitive.ResponsiveContainer
-    >["children"]
+    children: React.ReactNode // changed from ResponsiveContainer children
   }
 >(({ id, className, children, config, ...props }, ref) => {
   const uniqueId = React.useId()
@@ -58,9 +56,8 @@ const ChartContainer = React.forwardRef<
         {...props}
       >
         <ChartStyle id={chartId} config={config} />
-        <RechartsPrimitive.ResponsiveContainer>
-          {children}
-        </RechartsPrimitive.ResponsiveContainer>
+        {/* Remove ResponsiveContainer here */}
+        {children}
       </div>
     </ChartContext.Provider>
   )
@@ -69,7 +66,7 @@ ChartContainer.displayName = "Chart"
 
 const ChartStyle = ({ id, config }: { id: string; config: ChartConfig }) => {
   const colorConfig = Object.entries(config).filter(
-    ([_, config]) => config.theme || config.color
+    ([, config]) => config.theme || config.color
   )
 
   if (!colorConfig.length) {
@@ -139,7 +136,7 @@ const ChartTooltipContent = React.forwardRef<
       }
 
       const [item] = payload
-      const key = `${labelKey || item.dataKey || item.name || "value"}`
+      const key = `${labelKey || item?.dataKey || item?.name || "value"}`
       const itemConfig = getPayloadConfigFromPayload(config, item, key)
       const value =
         !labelKey && typeof label === "string"
@@ -360,6 +357,9 @@ export {
   ChartTooltip,
   ChartTooltipContent,
   ChartLegend,
+  ChartLegendContent,
+  ChartStyle,
+}
   ChartLegendContent,
   ChartStyle,
 }

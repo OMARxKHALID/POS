@@ -1,12 +1,12 @@
-"use client"
-import { useEffect } from "react"
-import type { SalesOrder, OrderTotals } from "@/types/pos"
+"use client";
+import { useEffect } from "react";
+import type { SalesOrder, OrderTotals } from "@/types/pos";
 
 interface ReceiptGeneratorProps {
-  open?: boolean
-  orderData?: SalesOrder | null
-  totals?: OrderTotals | null
-  onPrinted?: () => void
+  open?: boolean;
+  orderData?: SalesOrder | null;
+  totals?: OrderTotals | null;
+  onPrinted?: () => void;
 }
 
 export function ReceiptGenerator({
@@ -16,24 +16,24 @@ export function ReceiptGenerator({
   onPrinted = () => {},
 }: ReceiptGeneratorProps) {
   useEffect(() => {
-    if (!open || !orderData || !totals) return
+    if (!open || !orderData || !totals) return;
 
     const generateReceiptContent = () => {
       const actualSubtotal = orderData.items.reduce((sum, item) => {
-        return sum + item.price * item.quantity
-      }, 0)
+        return sum + item.price * item.quantity;
+      }, 0);
 
       const actualItemDiscounts = orderData.items.reduce((sum, item) => {
-        const itemTotal = item.price * item.quantity
-        const itemDiscount = (item.discount || 0) / 100
-        return sum + itemTotal * itemDiscount
-      }, 0)
+        const itemTotal = item.price * item.quantity;
+        const itemDiscount = (item.discount || 0) / 100;
+        return sum + itemTotal * itemDiscount;
+      }, 0);
 
-      const subtotalAfterItemDiscounts = actualSubtotal - actualItemDiscounts
-      const cartDiscountAmount = orderData.discount - actualItemDiscounts
-      const finalSubtotal = subtotalAfterItemDiscounts - cartDiscountAmount
-      const taxAmount = finalSubtotal * 0.1
-      const finalTotal = finalSubtotal + taxAmount
+      const subtotalAfterItemDiscounts = actualSubtotal - actualItemDiscounts;
+      const cartDiscountAmount = orderData.discount - actualItemDiscounts;
+      const finalSubtotal = subtotalAfterItemDiscounts - cartDiscountAmount;
+      const taxAmount = finalSubtotal * 0.1;
+      const finalTotal = finalSubtotal + taxAmount;
 
       return `
         <html>
@@ -41,129 +41,326 @@ export function ReceiptGenerator({
           <title>Order Receipt</title>
           <link href="https://fonts.googleapis.com/css2?family=Quantico:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet">
           <style>
-            body { 
-              font-family: 'Quantico', sans-serif; 
-              color: #222; 
-              background: #fff; 
-              margin: 0; 
-              padding: 20px; 
-              font-size: 12px;
-              line-height: 1.6;
-              font-weight: 400;
+            * {
+              margin: 0;
+              padding: 0;
+              box-sizing: border-box;
             }
-            .header { text-align: center; margin-bottom: 25px; }
-            .header h1 { margin: 0; font-size: 18px; font-weight: 700; }
-            .section { margin-bottom: 20px; }
-            .section div { margin-bottom: 4px; }
-            table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
-            th, td { text-align: left; padding: 4px 0; }
-            th { border-bottom: 2px solid #000; font-weight: 700; }
-            .total-row { font-weight: 700; border-top: 2px solid #000; }
-            .right { text-align: right; }
-            .center { text-align: center; }
-            .footer { text-align: center; margin-top: 25px; }
-            .discount { color: #16a34a; font-weight: 500; }
-            .bold { font-weight: 700; }
+
+            body {
+              font-family: 'Quantico', monospace;
+              color: #1a1a1a;
+              background: #fff;
+              padding: 20px;
+              font-size: 12px;
+              line-height: 1.4;
+              font-weight: 400;
+              max-width: 300px;
+              margin: 0 auto;
+            }
+
+            .receipt-container {
+              width: 100%;
+              max-width: 280px;
+              margin: 0 auto;
+            }
+
+            .header {
+              text-align: center;
+              margin-bottom: 20px;
+              border-bottom: 2px solid #000;
+              padding-bottom: 15px;
+            }
+
+            .header h1 {
+              font-size: 18px;
+              font-weight: 700;
+              margin-bottom: 5px;
+              letter-spacing: 1px;
+            }
+
+            .header .address {
+              font-size: 10px;
+              line-height: 1.3;
+              color: #555;
+            }
+
+            .section {
+              margin-bottom: 15px;
+            }
+
+            .section-row {
+              display: flex;
+              justify-content: space-between;
+              align-items: center;
+              margin-bottom: 3px;
+              font-size: 11px;
+            }
+
+            .section-row .label {
+              font-weight: 600;
+              color: #333;
+            }
+
+            .section-row .value {
+              font-weight: 400;
+              color: #666;
+            }
+
+            .items-table {
+              width: 100%;
+              border-collapse: collapse;
+              margin: 15px 0;
+            }
+
+            .items-table th {
+              text-align: left;
+              padding: 5px 0;
+              border-bottom: 1px solid #333;
+              font-weight: 700;
+              font-size: 10px;
+              text-transform: uppercase;
+            }
+
+            .items-table td {
+              padding: 4px 0;
+              font-size: 10px;
+              vertical-align: top;
+            }
+
+            .item-row {
+              border-bottom: 1px dotted #ccc;
+            }
+
+            .item-name {
+              font-weight: 600;
+              color: #333;
+            }
+
+            .item-notes {
+              font-size: 9px;
+              color: #666;
+              font-style: italic;
+              margin-top: 2px;
+            }
+
+            .item-discount {
+              font-size: 9px;
+              color: #16a34a;
+              font-weight: 600;
+              margin-top: 2px;
+            }
+
+            .text-right {
+              text-align: right;
+            }
+
+            .text-center {
+              text-align: center;
+            }
+
+            .totals-section {
+              margin-top: 15px;
+              padding-top: 10px;
+              border-top: 1px solid #333;
+            }
+
+            .total-row {
+              display: flex;
+              justify-content: space-between;
+              margin-bottom: 3px;
+              font-size: 11px;
+            }
+
+            .total-row.subtotal {
+              color: #666;
+            }
+
+            .total-row.discount {
+              color: #16a34a;
+              font-weight: 600;
+            }
+
+            .total-row.tax {
+              color: #666;
+            }
+
+            .total-row.final {
+              font-weight: 700;
+              font-size: 14px;
+              color: #000;
+              border-top: 2px solid #000;
+              padding-top: 5px;
+              margin-top: 8px;
+            }
+
+            .footer {
+              text-align: center;
+              margin-top: 20px;
+              padding-top: 15px;
+              border-top: 2px solid #000;
+              font-size: 11px;
+            }
+
+            .footer .thank-you {
+              font-weight: 700;
+              margin-bottom: 5px;
+              font-size: 12px;
+            }
+
+            .footer .come-again {
+              color: #666;
+              font-size: 10px;
+            }
+
+            @media print {
+              body {
+                padding: 10px;
+                font-size: 11px;
+              }
+
+              .receipt-container {
+                max-width: 260px;
+              }
+            }
           </style>
         </head>
         <body>
-          <div class="header">
-            <h1>RestaurantPOS</h1>
-            <div>123 Main Street</div>
-            <div>Phone: (555) 123-4567</div>
-          </div>
-          
-          <div class="section">
-            <div><span class="bold">Order: ${orderData.orderNumber}</span></div>
-            <div><span class="bold">Customer: ${orderData.customerName || "Guest"}</span></div>
-            <div><span class="bold">Payment: ${orderData.paymentMethod?.charAt(0).toUpperCase() + orderData.paymentMethod?.slice(1) || "Cash"}</span></div>
-            <div><span class="bold">Date: ${orderData.date}</span></div>
-            <div><span class="bold">Time: ${orderData.time}</span></div>
-          </div>
-          
-          <table>
-            <thead>
-              <tr>
-                <th>Item</th>
-                <th class="right">Qty</th>
-                <th class="right">Price</th>
-                <th class="right">Total</th>
-              </tr>
-            </thead>
-            <tbody>
-              ${orderData.items
-                .map((item) => {
-                  const itemTotal = item.price * item.quantity
-                  const itemDiscountAmount = itemTotal * ((item.discount || 0) / 100)
-                  const finalItemTotal = itemTotal - itemDiscountAmount
+          <div class="receipt-container">
+            <div class="header">
+              <h1>RestaurantPOS</h1>
+              <div class="address">
+                123 Main Street<br>
+                Phone: (555) 123-4567
+              </div>
+            </div>
 
-                  return `
-                    <tr>
-                      <td>${item.name}${item.notes ? `<br><small style="color: #666;">${item.notes}</small>` : ""}${item.discount && item.discount > 0 ? `<br><small class="discount">${item.discount}% OFF</small>` : ""}</td>
-                      <td class="right">${item.quantity}</td>
-                      <td class="right">$${item.price.toFixed(2)}</td>
-                      <td class="right">$${finalItemTotal.toFixed(2)}</td>
-                    </tr>
-                  `
-                })
-                .join("")}
-            </tbody>
-            <tfoot>
-              <tr>
-                <td colspan="3" class="right">Subtotal:</td>
-                <td class="right">$${actualSubtotal.toFixed(2)}</td>
-              </tr>
+            <div class="section">
+              <div class="section-row">
+                <span class="label">Order:</span>
+                <span class="value">${orderData.orderNumber}</span>
+              </div>
+              <div class="section-row">
+                <span class="label">Customer:</span>
+                <span class="value">${orderData.customerName || "Guest"}</span>
+              </div>
+              <div class="section-row">
+                <span class="label">Payment:</span>
+                <span class="value">${
+                  orderData.paymentMethod?.charAt(0).toUpperCase() +
+                    orderData.paymentMethod?.slice(1) || "Cash"
+                }</span>
+              </div>
+              <div class="section-row">
+                <span class="label">Date:</span>
+                <span class="value">${orderData.date}</span>
+              </div>
+              <div class="section-row">
+                <span class="label">Time:</span>
+                <span class="value">${orderData.time}</span>
+              </div>
+            </div>
+
+            <table class="items-table">
+              <thead>
+                <tr>
+                  <th style="width: 50%;">Item</th>
+                  <th style="width: 15%;" class="text-center">Qty</th>
+                  <th style="width: 20%;" class="text-right">Price</th>
+                  <th style="width: 15%;" class="text-right">Total</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${orderData.items
+                  .map((item) => {
+                    const itemTotal = item.price * item.quantity;
+                    const itemDiscountAmount =
+                      itemTotal * ((item.discount || 0) / 100);
+                    const finalItemTotal = itemTotal - itemDiscountAmount;
+
+                    return `
+                      <tr class="item-row">
+                        <td>
+                          <div class="item-name">${item.name}</div>
+                          ${
+                            item.notes
+                              ? `<div class="item-notes">Note: ${item.notes}</div>`
+                              : ""
+                          }
+                          ${
+                            item.discount && item.discount > 0
+                              ? `<div class="item-discount">${item.discount}% OFF</div>`
+                              : ""
+                          }
+                        </td>
+                        <td class="text-center">${item.quantity}</td>
+                        <td class="text-right">$${item.price.toFixed(2)}</td>
+                        <td class="text-right">$${finalItemTotal.toFixed(
+                          2
+                        )}</td>
+                      </tr>
+                    `;
+                  })
+                  .join("")}
+              </tbody>
+            </table>
+
+            <div class="totals-section">
+              <div class="total-row subtotal">
+                <span>Subtotal:</span>
+                <span>$${actualSubtotal.toFixed(2)}</span>
+              </div>
               ${
                 actualItemDiscounts > 0
-                  ? `<tr>
-                      <td colspan="3" class="right discount">Item Discounts:</td>
-                      <td class="right discount">-$${actualItemDiscounts.toFixed(2)}</td>
-                    </tr>`
+                  ? `<div class="total-row discount">
+                      <span>Item Discounts:</span>
+                      <span>-$${actualItemDiscounts.toFixed(2)}</span>
+                    </div>`
                   : ""
               }
               ${
                 cartDiscountAmount > 0
-                  ? `<tr>
-                      <td colspan="3" class="right discount">Cart Discount:</td>
-                      <td class="right discount">-$${cartDiscountAmount.toFixed(2)}</td>
-                    </tr>`
+                  ? `<div class="total-row discount">
+                      <span>Cart Discount:</span>
+                      <span>-$${cartDiscountAmount.toFixed(2)}</span>
+                    </div>`
                   : ""
               }
-              <tr>
-                <td colspan="3" class="right">Tax (10%):</td>
-                <td class="right">$${taxAmount.toFixed(2)}</td>
-              </tr>
-              <tr class="total-row">
-                <td colspan="3" class="right"><span class="bold">TOTAL:</span></td>
-                <td class="right"><span class="bold">$${finalTotal.toFixed(2)}</span></td>
-              </tr>
-            </tfoot>
-          </table>
-          
-          <div class="footer">
-            <div class="bold">Thank you for your order!</div>
-            <div>Please come again</div>
+              <div class="total-row tax">
+                <span>Tax (10%):</span>
+                <span>$${taxAmount.toFixed(2)}</span>
+              </div>
+              <div class="total-row final">
+                <span>TOTAL:</span>
+                <span>$${finalTotal.toFixed(2)}</span>
+              </div>
+            </div>
+
+            <div class="footer">
+              <div class="thank-you">Thank you for your order!</div>
+              <div class="come-again">Please come again</div>
+            </div>
           </div>
-          
+
           <script>
-            window.onload = function() { 
-              window.print(); 
-              setTimeout(() => window.close(), 1000); 
+            window.onload = function() {
+              window.print();
+              setTimeout(() => window.close(), 1000);
             };
           </script>
         </body>
         </html>
-      `
-    }
+      `;
+    };
 
-    const printWindow = window.open("", "_blank", "width=400,height=600")
+    const printWindow = window.open("", "_blank", "width=400,height=600");
     if (printWindow) {
-      printWindow.document.open()
-      printWindow.document.write(generateReceiptContent())
-      printWindow.document.close()
+      printWindow.document.open();
+      printWindow.document.write(generateReceiptContent());
+      printWindow.document.close();
     }
-    onPrinted()
-  }, [open, orderData, totals, onPrinted])
+    onPrinted();
+  }, [open, orderData, totals, onPrinted]);
 
-  return null
+  return null;
 }

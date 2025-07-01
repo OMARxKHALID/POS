@@ -1,4 +1,4 @@
-import type { Category, MenuItem } from "@/types/pos"
+import type { Category, MenuItem } from "@/types/pos";
 
 export const categories: Category[] = [
   { id: "all", name: "All", icon: "🍽️", count: 24 },
@@ -6,7 +6,7 @@ export const categories: Category[] = [
   { id: "pizza", name: "Pizza", icon: "🍕", count: 6 },
   { id: "drinks", name: "Drinks", icon: "🥤", count: 5 },
   { id: "desserts", name: "Desserts", icon: "🍰", count: 5 },
-]
+];
 
 export const menuItems: MenuItem[] = [
   // Burgers
@@ -232,4 +232,4 @@ export const menuItems: MenuItem[] = [
     description: "New York style cheesecake",
     image: "/placeholder.svg?height=200&width=200",
   },
-]
+];

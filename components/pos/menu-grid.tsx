@@ -37,18 +37,16 @@ export function MenuGrid({
   if (items.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center h-full text-muted-foreground">
-        <div className="text-6xl mb-4">🔍</div>
-        <p className="text-lg font-quantico">No items found</p>
-        <p className="text-sm mt-1">
-          Try adjusting your search or category filter
-        </p>
+        <div className="text-6xl mb-4 opacity-40">🔍</div>
+        <p className="text-sm font-quantico font-medium mb-1">No items found</p>
+        <p className="text-xs">Try adjusting your search or category filter</p>
       </div>
     );
   }
 
   return (
-    <div className="h-full overflow-y-auto p-4">
-      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-7 2xl:grid-cols-9 gap-4">
+    <div className="h-full overflow-y-auto px-4 pb-4">
+      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-7 2xl:grid-cols-8 gap-3">
         {items.map((item) => (
           <MenuItemCard key={item.id} item={item} onSelect={onItemSelect} />
         ))}

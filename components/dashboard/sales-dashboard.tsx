@@ -1,9 +1,9 @@
-"use client"
+"use client";
 
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import { useSalesStore } from "@/hooks/use-sales-store"
-import { formatCurrency } from "@/utils/pos-utils"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { useSalesStore } from "@/hooks/use-sales-store";
+import { formatCurrency } from "@/utils/pos-utils";
 import {
   DollarSign,
   ShoppingCart,
@@ -15,23 +15,28 @@ import {
   Banknote,
   Smartphone,
   BarChart3,
-} from "lucide-react"
-import { useMemo } from "react"
+  Store,
+} from "lucide-react";
+import Link from "next/link";
+import { useMemo } from "react";
+import { Button } from "../ui/button";
 
 export function SalesDashboard() {
-  const { getAnalytics } = useSalesStore()
-  const analytics = useMemo(() => getAnalytics(), [getAnalytics])
+  const { getAnalytics } = useSalesStore();
+  const analytics = useMemo(() => getAnalytics(), [getAnalytics]);
 
   const paymentMethodIcons = {
     cash: Banknote,
     card: CreditCard,
     mobile: Smartphone,
-  }
+  };
 
   const MetricCard = ({ title, value, change, icon: Icon, color }: any) => (
     <Card className={`${color} border-opacity-20`}>
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-        <CardTitle className="text-sm font-medium font-quantico">{title}</CardTitle>
+        <CardTitle className="text-sm font-medium font-quantico">
+          {title}
+        </CardTitle>
         <Icon className="h-4 w-4" />
       </CardHeader>
       <CardContent className="pb-3">
@@ -42,17 +47,33 @@ export function SalesDashboard() {
         </p>
       </CardContent>
     </Card>
-  )
+  );
 
   return (
     <div className="h-full overflow-y-auto">
       <div className="p-6 space-y-6">
-        <div className="flex items-center gap-3">
-          <BarChart3 className="w-6 h-6 text-primary" />
-          <div>
-            <h1 className="text-2xl font-bold text-foreground font-quantico">Analytics Overview</h1>
-            <p className="text-sm text-muted-foreground font-quantico">Track your restaurant's performance</p>
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <BarChart3 className="w-6 h-6 text-primary" />
+            <div>
+              <h1 className="text-2xl font-bold text-foreground font-quantico">
+                Analytics Overview
+              </h1>
+              <p className="text-sm text-muted-foreground font-quantico">
+                Track your restaurant's performance
+              </p>
+            </div>
           </div>
+          <Link href="/">
+            <Button
+              variant="outline"
+              size="sm"
+              className="h-7 px-3 text-xs font-quantico bg-white/60 border-gray-200"
+            >
+              <Store className="w-3 h-3 mr-1" />
+              <span className="hidden sm:inline">POS</span>
+            </Button>
+          </Link>
         </div>
 
         {/* Key Metrics */}
@@ -99,13 +120,18 @@ export function SalesDashboard() {
             <CardContent>
               <div className="space-y-3">
                 {analytics.topProducts.slice(0, 5).map((product, index) => (
-                  <div key={product.name} className="flex items-center justify-between p-3 bg-muted/50 rounded-lg">
+                  <div
+                    key={product.name}
+                    className="flex items-center justify-between p-3 bg-muted/50 rounded-lg"
+                  >
                     <div className="flex items-center gap-3">
                       <Badge className="w-8 h-8 rounded-lg flex items-center justify-center font-bold text-sm font-quantico">
                         {index + 1}
                       </Badge>
                       <div>
-                        <p className="text-sm font-medium text-foreground font-quantico">{product.name}</p>
+                        <p className="text-sm font-medium text-foreground font-quantico">
+                          {product.name}
+                        </p>
                         <p className="text-xs text-muted-foreground flex items-center gap-1 font-quantico">
                           <ShoppingCart className="w-3 h-3" />
                           {product.quantity} sold
@@ -122,7 +148,9 @@ export function SalesDashboard() {
                 {analytics.topProducts.length === 0 && (
                   <div className="text-center py-8 text-muted-foreground">
                     <Award className="h-12 w-12 mx-auto mb-3" />
-                    <p className="text-sm font-quantico">No sales data available</p>
+                    <p className="text-sm font-quantico">
+                      No sales data available
+                    </p>
                   </div>
                 )}
               </div>
@@ -140,13 +168,18 @@ export function SalesDashboard() {
             <CardContent>
               <div className="space-y-3">
                 {analytics.topCustomers.slice(0, 5).map((customer) => (
-                  <div key={customer.name} className="flex items-center justify-between p-3 bg-muted/50 rounded-lg">
+                  <div
+                    key={customer.name}
+                    className="flex items-center justify-between p-3 bg-muted/50 rounded-lg"
+                  >
                     <div className="flex items-center gap-3">
                       <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center text-primary-foreground font-bold text-sm font-quantico">
                         {customer.name.charAt(0).toUpperCase()}
                       </div>
                       <div>
-                        <p className="text-sm font-medium text-foreground font-quantico">{customer.name}</p>
+                        <p className="text-sm font-medium text-foreground font-quantico">
+                          {customer.name}
+                        </p>
                         <p className="text-xs text-muted-foreground flex items-center gap-1 font-quantico">
                           <ShoppingCart className="w-3 h-3" />
                           {customer.orders} orders
@@ -163,7 +196,9 @@ export function SalesDashboard() {
                 {analytics.topCustomers.length === 0 && (
                   <div className="text-center py-8 text-muted-foreground">
                     <Users className="h-12 w-12 mx-auto mb-3" />
-                    <p className="text-sm font-quantico">No customer data available</p>
+                    <p className="text-sm font-quantico">
+                      No customer data available
+                    </p>
                   </div>
                 )}
               </div>
@@ -183,14 +218,14 @@ export function SalesDashboard() {
             <CardContent>
               <div className="space-y-3">
                 {analytics.salesByDay.map((day) => (
-                  <div key={day.date} className="flex items-center justify-between p-3 bg-muted/50 rounded-lg">
+                  <div
+                    key={day.date}
+                    className="flex items-center justify-between p-3 bg-muted/50 rounded-lg"
+                  >
                     <div>
                       <p className="text-sm font-medium text-foreground font-quantico">
-                        {new Date(day.date).toLocaleDateString("en-US", {
-                          weekday: "short",
-                          month: "short",
-                          day: "numeric",
-                        })}
+                        {/* Avoid toLocaleDateString in render, just show day.date */}
+                        {day.date}
                       </p>
                       <p className="text-xs text-muted-foreground flex items-center gap-1 font-quantico">
                         <ShoppingCart className="w-3 h-3" />
@@ -198,7 +233,9 @@ export function SalesDashboard() {
                       </p>
                     </div>
                     <div className="text-right">
-                      <p className="text-sm font-semibold text-foreground font-quantico">{formatCurrency(day.sales)}</p>
+                      <p className="text-sm font-semibold text-foreground font-quantico">
+                        {formatCurrency(day.sales)}
+                      </p>
                     </div>
                   </div>
                 ))}
@@ -217,33 +254,48 @@ export function SalesDashboard() {
             <CardContent>
               <div className="space-y-3">
                 {analytics.salesByPaymentMethod.map((payment) => {
-                  const Icon = paymentMethodIcons[payment.method as keyof typeof paymentMethodIcons] || CreditCard
-                  const percentage = analytics.totalSales > 0 ? (payment.amount / analytics.totalSales) * 100 : 0
+                  const Icon =
+                    paymentMethodIcons[
+                      payment.method as keyof typeof paymentMethodIcons
+                    ] || CreditCard;
+                  const percentage =
+                    analytics.totalSales > 0
+                      ? (payment.amount / analytics.totalSales) * 100
+                      : 0;
 
                   return (
-                    <div key={payment.method} className="flex items-center justify-between p-3 bg-muted/50 rounded-lg">
+                    <div
+                      key={payment.method}
+                      className="flex items-center justify-between p-3 bg-muted/50 rounded-lg"
+                    >
                       <div className="flex items-center gap-3">
                         <Icon className="h-5 w-5 text-muted-foreground" />
                         <div>
                           <p className="text-sm font-medium text-foreground capitalize font-quantico">
                             {payment.method}
                           </p>
-                          <p className="text-xs text-muted-foreground font-quantico">{payment.count} transactions</p>
+                          <p className="text-xs text-muted-foreground font-quantico">
+                            {payment.count} transactions
+                          </p>
                         </div>
                       </div>
                       <div className="text-right">
                         <p className="text-sm font-semibold text-foreground font-quantico">
                           {formatCurrency(payment.amount)}
                         </p>
-                        <p className="text-xs text-muted-foreground font-quantico">{percentage.toFixed(1)}%</p>
+                        <p className="text-xs text-muted-foreground font-quantico">
+                          {percentage.toFixed(1)}%
+                        </p>
                       </div>
                     </div>
-                  )
+                  );
                 })}
                 {analytics.salesByPaymentMethod.length === 0 && (
                   <div className="text-center py-8 text-muted-foreground">
                     <CreditCard className="h-12 w-12 mx-auto mb-3" />
-                    <p className="text-sm font-quantico">No payment data available</p>
+                    <p className="text-sm font-quantico">
+                      No payment data available
+                    </p>
                   </div>
                 )}
               </div>
@@ -252,5 +304,5 @@ export function SalesDashboard() {
         </div>
       </div>
     </div>
-  )
+  );
 }

@@ -1,54 +1,75 @@
-"use client"
+"use client";
 
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
-import { useCartStore } from "@/hooks/use-cart-store"
-import { useState, useEffect } from "react"
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { useCartStore } from "@/hooks/use-cart-store";
+import { useState, useEffect } from "react";
 
 interface DiscountModalProps {
-  open: boolean
-  onOpenChange: (open: boolean) => void
-  currentDiscount: number
-  type: "item" | "cart"
-  itemId?: string
-  itemName?: string
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  currentDiscount: number;
+  type: "item" | "cart";
+  itemId?: string;
+  itemName?: string;
 }
 
-export function DiscountModal({ open, onOpenChange, currentDiscount, type, itemId, itemName }: DiscountModalProps) {
-  const { applyItemDiscount, applyCartDiscount, removeItemDiscount, removeCartDiscount } = useCartStore()
-  const [tempDiscount, setTempDiscount] = useState("")
+export function DiscountModal({
+  open,
+  onOpenChange,
+  currentDiscount,
+  type,
+  itemId,
+  itemName,
+}: DiscountModalProps) {
+  const {
+    applyItemDiscount,
+    applyCartDiscount,
+    removeItemDiscount,
+    removeCartDiscount,
+  } = useCartStore();
+  const [tempDiscount, setTempDiscount] = useState("");
 
   useEffect(() => {
     if (open) {
-      setTempDiscount(currentDiscount.toString())
+      setTempDiscount(currentDiscount.toString());
     }
-  }, [open, currentDiscount])
+  }, [open, currentDiscount]);
 
   const handleApplyDiscount = () => {
-    const discount = Math.max(0, Math.min(100, Number.parseFloat(tempDiscount) || 0))
+    const discount = Math.max(
+      0,
+      Math.min(100, Number.parseFloat(tempDiscount) || 0)
+    );
 
     if (type === "item" && itemId) {
-      applyItemDiscount(itemId, discount)
+      applyItemDiscount(itemId, discount);
     } else if (type === "cart") {
-      applyCartDiscount(discount)
+      applyCartDiscount(discount);
     }
 
-    onOpenChange(false)
-  }
+    onOpenChange(false);
+  };
 
   const handleRemoveDiscount = () => {
     if (type === "item" && itemId) {
-      removeItemDiscount(itemId)
+      removeItemDiscount(itemId);
     } else if (type === "cart") {
-      removeCartDiscount()
+      removeCartDiscount();
     }
 
-    onOpenChange(false)
-  }
+    onOpenChange(false);
+  };
 
-  const title = type === "item" ? `Item Discount - ${itemName}` : "Apply Cart Discount"
+  const title =
+    type === "item" ? `Item Discount - ${itemName}` : "Apply Cart Discount";
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -58,7 +79,10 @@ export function DiscountModal({ open, onOpenChange, currentDiscount, type, itemI
         </DialogHeader>
         <div className="space-y-4">
           <div>
-            <Label htmlFor="discount" className="text-sm font-medium font-quantico">
+            <Label
+              htmlFor="discount"
+              className="text-sm font-medium font-quantico"
+            >
               Discount Percentage
             </Label>
             <Input
@@ -73,15 +97,22 @@ export function DiscountModal({ open, onOpenChange, currentDiscount, type, itemI
             />
           </div>
           <div className="flex gap-2">
-            <Button onClick={handleApplyDiscount} className="flex-1 font-quantico">
+            <Button
+              onClick={handleApplyDiscount}
+              className="flex-1 font-quantico"
+            >
               Apply
             </Button>
-            <Button variant="outline" onClick={handleRemoveDiscount} className="flex-1 font-quantico bg-transparent">
+            <Button
+              variant="outline"
+              onClick={handleRemoveDiscount}
+              className="flex-1 font-quantico bg-transparent"
+            >
               Remove
             </Button>
           </div>
         </div>
       </DialogContent>
     </Dialog>
-  )
+  );
 }

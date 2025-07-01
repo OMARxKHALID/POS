@@ -1,18 +1,26 @@
-"use client"
+"use client";
 
-import { Button } from "@/components/ui/button"
-import { Calendar, Clock, Circle, ShoppingCart, BarChart3, Store } from "lucide-react"
-import { useCartStore } from "@/hooks/use-cart-store"
-import Link from "next/link"
+import { Button } from "@/components/ui/button";
+import {
+  Calendar,
+  Clock,
+  Circle,
+  ShoppingCart,
+  BarChart3,
+  Store,
+} from "lucide-react";
+import { useCartStore } from "@/hooks/use-cart-store";
+import Link from "next/link";
+import { useEffect, useState } from "react";
 
 interface PageHeaderProps {
-  title: string
-  subtitle?: string
-  showCartToggle?: boolean
-  showDashboard?: boolean
-  showPOS?: boolean
-  toggleCart?: () => void
-  orderType?: "open" | "closed"
+  title: string;
+  subtitle?: string;
+  showCartToggle?: boolean;
+  showDashboard?: boolean;
+  showPOS?: boolean;
+  toggleCart?: () => void;
+  orderType?: "open" | "closed";
 }
 
 export function PageHeader({
@@ -24,19 +32,29 @@ export function PageHeader({
   toggleCart = () => {},
   orderType = "open",
 }: PageHeaderProps) {
-  const { orderItems } = useCartStore()
-  const currentDate = new Date()
-  const dateString = currentDate.toLocaleDateString("en-US", {
-    month: "short",
-    day: "numeric",
-  })
-  const timeString = currentDate.toLocaleTimeString("en-US", {
-    hour: "2-digit",
-    minute: "2-digit",
-    hour12: false,
-  })
+  const { orderItems } = useCartStore();
+  // Use state for date/time, set after mount
+  const [dateString, setDateString] = useState<string>("");
+  const [timeString, setTimeString] = useState<string>("");
 
-  const totalItems = orderItems.reduce((sum, item) => sum + item.quantity, 0)
+  useEffect(() => {
+    const currentDate = new Date();
+    setDateString(
+      currentDate.toLocaleDateString("en-US", {
+        month: "short",
+        day: "numeric",
+      })
+    );
+    setTimeString(
+      currentDate.toLocaleTimeString("en-US", {
+        hour: "2-digit",
+        minute: "2-digit",
+        hour12: false,
+      })
+    );
+  }, []);
+
+  const totalItems = orderItems.reduce((sum, item) => sum + item.quantity, 0);
 
   return (
     <div className="flex items-center justify-between mb-4 font-zen">
@@ -46,11 +64,11 @@ export function PageHeader({
         <div className="hidden sm:flex items-center gap-4 text-xs text-gray-500">
           <div className="flex items-center gap-1">
             <Calendar className="w-3 h-3" />
-            <span>{dateString}</span>
+            <span>{dateString || "..."}</span>
           </div>
           <div className="flex items-center gap-1">
             <Clock className="w-3 h-3" />
-            <span>{timeString}</span>
+            <span>{timeString || "..."}</span>
           </div>
         </div>
       </div>
@@ -59,17 +77,27 @@ export function PageHeader({
         <div className="flex items-center gap-2">
           <Circle
             className={`h-2 w-2 ${
-              orderType === "open" ? "fill-green-500 text-green-500" : "fill-red-500 text-red-500"
+              orderType === "open"
+                ? "fill-green-500 text-green-500"
+                : "fill-red-500 text-red-500"
             }`}
           />
-          <span className={`text-xs font-medium ${orderType === "open" ? "text-green-600" : "text-red-600"}`}>
+          <span
+            className={`text-xs font-medium ${
+              orderType === "open" ? "text-green-600" : "text-red-600"
+            }`}
+          >
             {orderType === "open" ? "Open" : "Closed"}
           </span>
         </div>
 
         {showDashboard && (
           <Link href="/dashboard">
-            <Button variant="outline" size="sm" className="h-8 px-3 text-xs font-zen bg-transparent">
+            <Button
+              variant="outline"
+              size="sm"
+              className="h-8 px-3 text-xs font-zen bg-transparent"
+            >
               <BarChart3 className="w-3 h-3 mr-1" />
               <span className="hidden sm:inline">Dashboard</span>
             </Button>
@@ -78,7 +106,11 @@ export function PageHeader({
 
         {showPOS && (
           <Link href="/">
-            <Button variant="outline" size="sm" className="h-8 px-3 text-xs font-zen bg-transparent">
+            <Button
+              variant="outline"
+              size="sm"
+              className="h-8 px-3 text-xs font-zen bg-transparent"
+            >
               <Store className="w-3 h-3 mr-1" />
               <span className="hidden sm:inline">POS</span>
             </Button>
@@ -103,5 +135,5 @@ export function PageHeader({
         )}
       </div>
     </div>
-  )
+  );
 }
