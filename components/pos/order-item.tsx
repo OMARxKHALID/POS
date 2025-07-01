@@ -6,7 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { X, Edit3 } from "lucide-react";
 import { QuantityControl } from "@/components/ui/quantity-control";
 import { DiscountModal } from "./discount-modal";
-import { useHydratedCartStore } from "@/hooks/use-cart-store";
+import { useCartStore } from "@/hooks/use-cart-store";
 import { useState } from "react";
 import type { CartItem } from "@/types/pos";
 
@@ -15,7 +15,7 @@ interface OrderItemProps {
 }
 
 export function OrderItem({ item }: OrderItemProps) {
-  const cartStore = useHydratedCartStore();
+  const cartStore = useCartStore();
   const [discountModalOpen, setDiscountModalOpen] = useState(false);
 
   const handleDecrease = () => {

@@ -26,13 +26,8 @@ export function OrderCart({
   toggleCart = () => {},
   isMobile = false,
 }: OrderCartProps) {
-  const {
-    orderItems,
-    clearCart,
-    cartDiscount,
-    isHydrated: cartHydrated,
-  } = useCartStore();
-  const { addOrder, isHydrated: salesHydrated } = useSalesStore();
+  const { orderItems, clearCart, cartDiscount } = useCartStore();
+  const { addOrder } = useSalesStore();
 
   const [localOrderNumber, setLocalOrderNumber] = useState<string | null>(null);
   const [discountModalOpen, setDiscountModalOpen] = useState(false);
@@ -87,42 +82,6 @@ export function OrderCart({
   );
 
   const hasItems = orderItems.length > 0;
-
-  // Show loading state until both stores are hydrated
-  if (!cartHydrated || !salesHydrated) {
-    return (
-      <Card className="flex flex-col h-full overflow-hidden bg-white/90 backdrop-blur-sm border-gray-200 rounded-lg shadow-sm animate-pulse">
-        <CardHeader className="pb-3 bg-gradient-to-r from-primary/5 to-primary/10 border-b border-primary/10">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="w-8 h-8 bg-muted rounded-lg" />
-              <div>
-                <div className="h-4 w-24 bg-muted rounded mb-1" />
-                <div className="h-3 w-16 bg-muted rounded" />
-              </div>
-            </div>
-          </div>
-        </CardHeader>
-        <CardContent className="flex-1 p-3">
-          <div className="space-y-3">
-            {[...Array(3)].map((_, i) => (
-              <div
-                key={i}
-                className="flex items-center gap-3 p-3 bg-muted/50 rounded-lg"
-              >
-                <div className="w-12 h-12 bg-muted rounded" />
-                <div className="flex-1">
-                  <div className="h-4 w-24 bg-muted rounded mb-1" />
-                  <div className="h-3 w-16 bg-muted rounded" />
-                </div>
-                <div className="h-4 w-12 bg-muted rounded" />
-              </div>
-            ))}
-          </div>
-        </CardContent>
-      </Card>
-    );
-  }
 
   return (
     <>
