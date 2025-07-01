@@ -4,6 +4,10 @@ import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
 import type { CartItem, MenuItem } from "@/types/pos";
 
+// Helper function for discount validation
+const clampDiscount = (discount: number) =>
+  Math.max(0, Math.min(100, discount));
+
 interface CartStore {
   orderItems: CartItem[];
   cartDiscount: number;
@@ -26,63 +30,64 @@ export const useCartStore = create<CartStore>()(
       cartDiscount: 0,
 
       addToCart: (item, quantity) =>
-        set((state) => {
-          const existingItem = state.orderItems.find((i) => i.id === item.id);
-          if (existingItem) {
-            return {
-              orderItems: state.orderItems.map((i) =>
-                i.id === item.id ? { ...i, quantity: i.quantity + quantity } : i
-              ),
+        set(({ orderItems }) => {
+          const existingIndex = orderItems.findIndex((i) => i.id === item.id);
+
+          if (existingIndex >= 0) {
+            const updatedItems = [...orderItems];
+            updatedItems[existingIndex] = {
+              ...updatedItems[existingIndex],
+              quantity: updatedItems[existingIndex].quantity + quantity,
             };
+            return { orderItems: updatedItems };
           }
+
           return {
             orderItems: [
-              ...state.orderItems,
+              ...orderItems,
               {
-                id: item.id,
-                name: item.name,
-                price: item.price,
+                ...item,
                 quantity,
-                icon: item.icon,
-                category: item.category,
                 discount: 0,
-              },
+              } as CartItem,
             ],
           };
         }),
 
       updateQuantity: (id, quantity) =>
-        set((state) => ({
+        set(({ orderItems }) => ({
           orderItems:
             quantity <= 0
-              ? state.orderItems.filter((item) => item.id !== id)
-              : state.orderItems.map((item) =>
+              ? orderItems.filter((item) => item.id !== id)
+              : orderItems.map((item) =>
                   item.id === id ? { ...item, quantity } : item
                 ),
         })),
 
       removeFromCart: (id) =>
-        set((state) => ({
-          orderItems: state.orderItems.filter((item) => item.id !== id),
+        set(({ orderItems }) => ({
+          orderItems: orderItems.filter((item) => item.id !== id),
         })),
 
       clearCart: () => set({ orderItems: [], cartDiscount: 0 }),
 
       applyItemDiscount: (id, discount) =>
-        set((state) => ({
-          orderItems: state.orderItems.map((item) =>
+        set(({ orderItems }) => ({
+          orderItems: orderItems.map((item) =>
             item.id === id
-              ? { ...item, discount: Math.max(0, Math.min(100, discount)) }
+              ? { ...item, discount: clampDiscount(discount) }
               : item
           ),
         })),
 
       applyCartDiscount: (discount) =>
-        set({ cartDiscount: Math.max(0, Math.min(100, discount)) }),
+        set({
+          cartDiscount: clampDiscount(discount),
+        }),
 
       removeItemDiscount: (id) =>
-        set((state) => ({
-          orderItems: state.orderItems.map((item) =>
+        set(({ orderItems }) => ({
+          orderItems: orderItems.map((item) =>
             item.id === id ? { ...item, discount: 0 } : item
           ),
         })),

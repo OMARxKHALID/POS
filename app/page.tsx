@@ -1,6 +1,6 @@
 "use client";
 
-import { PageHeader } from "@/components/shared/page-header";
+import { PageHeader } from "@/components/shared/header";
 import { CategoryNav } from "@/components/pos/category-nav";
 import { SearchBar } from "@/components/pos/search-bar";
 import { MenuGrid } from "@/components/pos/menu-grid";
@@ -18,13 +18,13 @@ export default function PosPage() {
   const toggleCart = () => setCartOpen((prev) => !prev);
 
   return (
-    <div className="h-screen w-full overflow-hidden bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50">
+    <div className="h-screen w-full overflow-hidden">
       {/* Mobile Layout */}
       <div className="flex flex-col h-full lg:hidden">
-        <div className="flex flex-col flex-1 bg-white/90 backdrop-blur-sm m-2 rounded-lg shadow-sm border border-white/60 overflow-hidden">
-          <div className="flex-shrink-0 px-4 py-3">
+        <div className="flex flex-col flex-1 bg-white/90 backdrop-blur-sm  rounded-lg shadow-sm border border-white/60 overflow-hidden">
+          <div className="flex-shrink-0 px-2 py-2">
             <PageHeader
-              title="POS System"
+              title="POS"
               showCartToggle
               toggleCart={toggleCart}
               showDashboard
@@ -58,11 +58,11 @@ export default function PosPage() {
       </div>
 
       {/* Desktop Layout */}
-      <div className="hidden lg:flex h-full p-4 gap-4">
+      <div className="hidden lg:flex h-full">
         <div className="flex-1 bg-white/90 backdrop-blur-sm rounded-lg shadow-sm border border-white/60 overflow-hidden flex flex-col">
           <div className="flex-shrink-0 px-6 py-4">
             <PageHeader
-              title="POS System"
+              title="POS"
               showCartToggle
               toggleCart={toggleCart}
               showDashboard

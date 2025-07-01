@@ -6,7 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { X, Edit3 } from "lucide-react";
 import { QuantityControl } from "@/components/ui/quantity-control";
 import { DiscountModal } from "./discount-modal";
-import { useCartStore } from "@/hooks/use-cart-store";
+import { useHydratedCartStore } from "@/hooks/use-cart-store";
 import { useState } from "react";
 import type { CartItem } from "@/types/pos";
 
@@ -15,14 +15,16 @@ interface OrderItemProps {
 }
 
 export function OrderItem({ item }: OrderItemProps) {
-  const { updateQuantity, removeFromCart } = useCartStore();
+  const cartStore = useHydratedCartStore();
   const [discountModalOpen, setDiscountModalOpen] = useState(false);
 
   const handleDecrease = () => {
+    if (!cartStore) return;
+
     if (item.quantity <= 1) {
-      removeFromCart(item.id);
+      cartStore.removeFromCart(item.id);
     } else {
-      updateQuantity(item.id, item.quantity - 1);
+      cartStore.updateQuantity(item.id, item.quantity - 1);
     }
   };
 
@@ -36,7 +38,7 @@ export function OrderItem({ item }: OrderItemProps) {
         <CardContent className="p-3">
           <div className="flex items-center gap-3">
             <div className="w-12 h-12 bg-gradient-to-br from-primary/10 to-primary/20 rounded-md flex items-center justify-center border border-primary/20 flex-shrink-0">
-              <span className="text-lg">{item.icon}</span>
+              <span className="text-3xl">{item.icon}</span>
             </div>
 
             <div className="flex-1 min-w-0">
@@ -54,7 +56,7 @@ export function OrderItem({ item }: OrderItemProps) {
                   variant="ghost"
                   size="sm"
                   className="h-6 w-6 p-0 text-gray-400 hover:text-destructive hover:bg-destructive/10 rounded-sm"
-                  onClick={() => removeFromCart(item.id)}
+                  onClick={() => cartStore?.removeFromCart(item.id)}
                 >
                   <X className="w-3 h-3" />
                 </Button>
@@ -66,7 +68,7 @@ export function OrderItem({ item }: OrderItemProps) {
                     quantity={item.quantity}
                     onDecrease={handleDecrease}
                     onIncrease={() =>
-                      updateQuantity(item.id, item.quantity + 1)
+                      cartStore?.updateQuantity(item.id, item.quantity + 1)
                     }
                     size="sm"
                   />

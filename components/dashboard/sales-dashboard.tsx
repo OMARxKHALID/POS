@@ -1,6 +1,13 @@
 "use client";
 
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+  CardFooter,
+} from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { useSalesStore } from "@/hooks/use-sales-store";
 import { formatCurrency } from "@/utils/pos-utils";
@@ -20,6 +27,19 @@ import {
 import Link from "next/link";
 import { useMemo } from "react";
 import { Button } from "../ui/button";
+import {
+  Area,
+  AreaChart,
+  CartesianGrid,
+  XAxis,
+  ResponsiveContainer,
+} from "recharts";
+import {
+  ChartConfig,
+  ChartContainer,
+  ChartTooltip,
+  ChartTooltipContent,
+} from "@/components/ui/chart";
 
 export function SalesDashboard() {
   const { getAnalytics } = useSalesStore();
@@ -216,31 +236,77 @@ export function SalesDashboard() {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="space-y-3">
-                {analytics.salesByDay.map((day) => (
-                  <div
-                    key={day.date}
-                    className="flex items-center justify-between p-3 bg-muted/50 rounded-lg"
+              <ChartContainer
+                config={{ sales: { label: "Sales", color: "var(--chart-1)" } }}
+              >
+                <ResponsiveContainer width="100%" height={256}>
+                  <AreaChart
+                    accessibilityLayer
+                    data={analytics.salesByDay}
+                    margin={{
+                      left: 12,
+                      right: 12,
+                    }}
                   >
-                    <div>
-                      <p className="text-sm font-medium text-foreground font-quantico">
-                        {/* Avoid toLocaleDateString in render, just show day.date */}
-                        {day.date}
-                      </p>
-                      <p className="text-xs text-muted-foreground flex items-center gap-1 font-quantico">
-                        <ShoppingCart className="w-3 h-3" />
-                        {day.orders} orders
-                      </p>
-                    </div>
-                    <div className="text-right">
-                      <p className="text-sm font-semibold text-foreground font-quantico">
-                        {formatCurrency(day.sales)}
-                      </p>
-                    </div>
-                  </div>
-                ))}
-              </div>
+                    <CartesianGrid vertical={false} />
+                    <XAxis
+                      dataKey="date"
+                      tickLine={false}
+                      axisLine={false}
+                      tickMargin={8}
+                      tickFormatter={(value: string) => {
+                        const date = new Date(value);
+                        return date.toLocaleDateString("en-US", {
+                          weekday: "short",
+                        });
+                      }}
+                    />
+                    <ChartTooltip
+                      cursor={false}
+                      content={<ChartTooltipContent indicator="line" />}
+                    />
+                    <Area
+                      dataKey="sales"
+                      type="natural"
+                      fill="var(--color-sales)"
+                      fillOpacity={0.4}
+                      stroke="var(--color-sales)"
+                    />
+                  </AreaChart>
+                </ResponsiveContainer>
+              </ChartContainer>
             </CardContent>
+            <CardFooter>
+              <div className="flex w-full items-start gap-2 text-sm">
+                <div className="grid gap-2">
+                  <div className="flex items-center gap-2 leading-none font-medium font-quantico">
+                    <TrendingUp className="h-4 w-4" />
+                    {analytics.salesByDay.length > 0 && (
+                      <>
+                        {formatCurrency(
+                          analytics.salesByDay.reduce(
+                            (sum, day) => sum + day.sales,
+                            0
+                          )
+                        )}{" "}
+                        total sales
+                      </>
+                    )}
+                  </div>
+                  <div className="text-muted-foreground flex items-center gap-2 leading-none font-quantico">
+                    {analytics.salesByDay.length > 0 && (
+                      <>
+                        {analytics.salesByDay.reduce(
+                          (sum, day) => sum + day.orders,
+                          0
+                        )}{" "}
+                        total orders
+                      </>
+                    )}
+                  </div>
+                </div>
+              </div>
+            </CardFooter>
           </Card>
 
           {/* Payment Methods */}
