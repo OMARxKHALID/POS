@@ -1,41 +1,52 @@
-"use client"
+"use client";
 
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardHeader } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import { Separator } from "@/components/ui/separator"
-import { X, Trash2, Percent, Receipt, Settings } from "lucide-react"
-import { useCartStore } from "@/hooks/use-cart-store"
-import { useSalesStore } from "@/hooks/use-sales-store"
-import { OrderItem } from "./order-item"
-import { PaymentModal } from "./payment-modal"
-import { DiscountModal } from "./discount-modal"
-import { ReceiptGenerator } from "./receipt-generator"
-import { useState, useMemo } from "react"
-import { calculateOrderTotals, generateOrderNumber } from "@/utils/pos-utils"
-import type { SalesOrder } from "@/types/pos"
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Separator } from "@/components/ui/separator";
+import { X, Trash2, Percent, Receipt, Settings } from "lucide-react";
+import { useCartStore } from "@/hooks/use-cart-store";
+import { useSalesStore } from "@/hooks/use-sales-store";
+import { OrderItem } from "./order-item";
+import { PaymentModal } from "./payment-modal";
+import { DiscountModal } from "./discount-modal";
+import { ReceiptGenerator } from "./receipt-generator";
+import { useState, useMemo, useEffect } from "react";
+import { calculateOrderTotals, generateOrderNumber } from "@/utils/pos-utils";
+import type { SalesOrder } from "@/types/pos";
 
 interface OrderCartProps {
-  cartOpen?: boolean
-  toggleCart?: () => void
-  isMobile?: boolean
+  cartOpen?: boolean;
+  toggleCart?: () => void;
+  isMobile?: boolean;
 }
 
-export function OrderCart({ cartOpen = false, toggleCart = () => {}, isMobile = false }: OrderCartProps) {
-  const { orderItems, clearCart, cartDiscount } = useCartStore()
-  const { addOrder } = useSalesStore()
-  const [localOrderNumber] = useState(() => generateOrderNumber())
-  const [discountModalOpen, setDiscountModalOpen] = useState(false)
-  const [paymentModalOpen, setPaymentModalOpen] = useState(false)
-  const [printReceipt, setPrintReceipt] = useState(false)
-  const [lastOrderData, setLastOrderData] = useState<SalesOrder | null>(null)
+export function OrderCart({
+  cartOpen = false,
+  toggleCart = () => {},
+  isMobile = false,
+}: OrderCartProps) {
+  const { orderItems, clearCart, cartDiscount } = useCartStore();
+  const { addOrder } = useSalesStore();
+  const [localOrderNumber, setLocalOrderNumber] = useState<string | null>(null);
+  const [discountModalOpen, setDiscountModalOpen] = useState(false);
+  const [paymentModalOpen, setPaymentModalOpen] = useState(false);
+  const [printReceipt, setPrintReceipt] = useState(false);
+  const [lastOrderData, setLastOrderData] = useState<SalesOrder | null>(null);
 
-  const totals = useMemo(() => calculateOrderTotals(orderItems, cartDiscount), [orderItems, cartDiscount])
+  const totals = useMemo(
+    () => calculateOrderTotals(orderItems, cartDiscount),
+    [orderItems, cartDiscount]
+  );
+
+  useEffect(() => {
+    setLocalOrderNumber(generateOrderNumber());
+  }, []);
 
   const handlePlaceOrder = (customerName: string, paymentMethod: string) => {
-    if (!orderItems.length) return
+    if (!orderItems.length || !localOrderNumber) return;
 
-    const now = new Date()
+    const now = new Date();
     const orderData: SalesOrder = {
       id: crypto.randomUUID(),
       items: orderItems,
@@ -50,15 +61,15 @@ export function OrderCart({ cartOpen = false, toggleCart = () => {}, isMobile = 
       date: now.toLocaleDateString(),
       time: now.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
       timestamp: now.getTime(),
-    }
+    };
 
-    addOrder(orderData)
-    setLastOrderData(orderData)
-    setPrintReceipt(true)
-    clearCart()
-    setPaymentModalOpen(false)
-    if (isMobile) toggleCart()
-  }
+    addOrder(orderData);
+    setLastOrderData(orderData);
+    setPrintReceipt(true);
+    clearCart();
+    setPaymentModalOpen(false);
+    if (isMobile) toggleCart();
+  };
 
   const CartHeader = () => (
     <CardHeader className="pb-3 bg-gradient-to-r from-primary/5 to-primary/10">
@@ -68,9 +79,12 @@ export function OrderCart({ cartOpen = false, toggleCart = () => {}, isMobile = 
             <Receipt className="w-5 h-5 text-primary-foreground" />
           </div>
           <div>
-            <h2 className="text-base font-bold text-foreground font-quantico">{localOrderNumber}</h2>
+            <h2 className="text-base font-bold text-foreground font-quantico">
+              {localOrderNumber ?? ""}
+            </h2>
             <p className="text-xs text-muted-foreground font-quantico">
-              {orderItems.length} items • {orderItems.reduce((sum, item) => sum + item.quantity, 0)} qty
+              {orderItems.length} items •{" "}
+              {orderItems.reduce((sum, item) => sum + item.quantity, 0)} qty
             </p>
           </div>
         </div>
@@ -80,7 +94,12 @@ export function OrderCart({ cartOpen = false, toggleCart = () => {}, isMobile = 
             <Settings className="w-4 h-4" />
           </Button>
           {isMobile && (
-            <Button variant="ghost" size="sm" className="h-8 w-8 p-0" onClick={toggleCart}>
+            <Button
+              variant="ghost"
+              size="sm"
+              className="h-8 w-8 p-0"
+              onClick={toggleCart}
+            >
               <X className="w-4 h-4" />
             </Button>
           )}
@@ -89,13 +108,16 @@ export function OrderCart({ cartOpen = false, toggleCart = () => {}, isMobile = 
 
       {cartDiscount > 0 && (
         <div className="mt-3 flex justify-end">
-          <Badge variant="secondary" className="bg-green-100 text-green-700 font-quantico">
+          <Badge
+            variant="secondary"
+            className="bg-green-100 text-green-700 font-quantico"
+          >
             {cartDiscount}% Cart Discount
           </Badge>
         </div>
       )}
     </CardHeader>
-  )
+  );
 
   const CartFooter = () => (
     <CardContent className="pt-0">
@@ -158,7 +180,7 @@ export function OrderCart({ cartOpen = false, toggleCart = () => {}, isMobile = 
         </div>
       </div>
     </CardContent>
-  )
+  );
 
   const EmptyCart = () => (
     <CardContent className="flex flex-col items-center justify-center h-full text-muted-foreground">
@@ -166,7 +188,7 @@ export function OrderCart({ cartOpen = false, toggleCart = () => {}, isMobile = 
       <p className="text-base font-quantico">Cart is empty</p>
       <p className="text-sm mt-1">Add items to get started</p>
     </CardContent>
-  )
+  );
 
   return (
     <>
@@ -209,5 +231,5 @@ export function OrderCart({ cartOpen = false, toggleCart = () => {}, isMobile = 
         onPrinted={() => setPrintReceipt(false)}
       />
     </>
-  )
+  );
 }

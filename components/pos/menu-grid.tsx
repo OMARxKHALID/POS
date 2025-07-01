@@ -1,30 +1,37 @@
-"use client"
+"use client";
 
-import { menuItems } from "@/data/menu-data"
-import { MenuItemCard } from "./menu-item-card"
-import { normalizeString } from "@/utils/pos-utils"
-import type { MenuItem } from "@/types/pos"
+import { menuItems } from "@/data/menu-data";
+import { MenuItemCard } from "./menu-item-card";
+import { normalizeString } from "@/utils/pos-utils";
+import type { MenuItem } from "@/types/pos";
 
 interface MenuGridProps {
-  selectedCategory: string
-  searchQuery: string
-  onItemSelect: (item: MenuItem) => void
+  selectedCategory: string;
+  searchQuery: string;
+  onItemSelect: (item: MenuItem) => void;
 }
 
-export function MenuGrid({ selectedCategory = "all", searchQuery = "", onItemSelect }: MenuGridProps) {
+export function MenuGrid({
+  selectedCategory = "all",
+  searchQuery = "",
+  onItemSelect,
+}: MenuGridProps) {
   let items =
     selectedCategory === "all"
       ? menuItems
-      : menuItems.filter((item) => normalizeString(item.category) === normalizeString(selectedCategory))
+      : menuItems.filter(
+          (item) =>
+            normalizeString(item.category) === normalizeString(selectedCategory)
+        );
 
   if (searchQuery.trim()) {
-    const q = searchQuery.toLowerCase()
+    const q = searchQuery.toLowerCase();
     items = items.filter(
       (item) =>
         item.name.toLowerCase().includes(q) ||
         item.category.toLowerCase().includes(q) ||
-        item.description.toLowerCase().includes(q),
-    )
+        item.description.toLowerCase().includes(q)
+    );
   }
 
   if (items.length === 0) {
@@ -32,18 +39,20 @@ export function MenuGrid({ selectedCategory = "all", searchQuery = "", onItemSel
       <div className="flex flex-col items-center justify-center h-full text-muted-foreground">
         <div className="text-6xl mb-4">🔍</div>
         <p className="text-lg font-quantico">No items found</p>
-        <p className="text-sm mt-1">Try adjusting your search or category filter</p>
+        <p className="text-sm mt-1">
+          Try adjusting your search or category filter
+        </p>
       </div>
-    )
+    );
   }
 
   return (
     <div className="h-full overflow-y-auto p-4">
-      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 2xl:grid-cols-8 gap-4">
+      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-7 2xl:grid-cols-9 gap-4">
         {items.map((item) => (
           <MenuItemCard key={item.id} item={item} onSelect={onItemSelect} />
         ))}
       </div>
     </div>
-  )
+  );
 }
